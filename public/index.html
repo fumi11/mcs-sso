@@ -154,12 +154,7 @@
                     document.getElementById("logout").style.display = "inline"
                 } catch (error) {
                     console.log("Silent login failed:", error);
-                    // サイレントログインに失敗した場合は既存のアカウント情報を使用
-                    user = accounts[0];
-                    msalInstance.setActiveAccount(user);
-                    document.getElementById("loginStatus").innerHTML = "Currently logged in as " + user.name + " on the website."
-                    document.getElementById("login").style.display = "none"
-                    document.getElementById("logout").style.display = "inline"
+                    // サイレントログインに失敗した場合は何もしない
                 }
             }
         }
