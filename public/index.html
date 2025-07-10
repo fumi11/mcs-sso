@@ -146,7 +146,7 @@
                         account: accounts[0]
                     };
                     
-                    await msalInstance.acquireTokenSilent(silentRequest);
+                    await msalInstance.ssoSilent(silentRequest);
                     user = accounts[0];
                     
                     document.getElementById("loginStatus").innerHTML = "Currently logged in as " + user.name + " on the website."
