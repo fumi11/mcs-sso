@@ -143,7 +143,8 @@
                 try {
                     const silentRequest = {
                         scopes: loginRequest.scopes,
-                        account: accounts[0]
+                        account: accounts[0],
+                        loginHint: accounts[0].username || accounts[0].name
                     };
                     
                     await msalInstance.ssoSilent(silentRequest);
