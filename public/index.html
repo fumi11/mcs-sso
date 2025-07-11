@@ -154,36 +154,17 @@
                     document.getElementById("login").style.display = "none"
                     document.getElementById("logout").style.display = "inline"
                 } catch (error) {
-                    console.log("Cached silent login failed:", error);
-                    // キャッシュ認証に失敗した場合、ssoSilentにフォールバック
-                    try {
-                        const ssoRequest = {
-                            scopes: loginRequest.scopes,
-                            account: accounts[0],
-                            loginHint: accounts[0].username || accounts[0].name
-                        };
-                        
-                        await msalInstance.ssoSilent(ssoRequest);
-                        user = accounts[0];
-                        
-                        document.getElementById("loginStatus").innerHTML = "Currently logged in as " + user.name + " on the website."
-                        document.getElementById("login").style.display = "none"
-                        document.getElementById("logout").style.display = "inline"
-                    } catch (ssoError) {
-                        console.log("SSO Silent login also failed:", ssoError);
-                        // 両方失敗した場合、アカウント情報は保持するが再ログインを促す
-                        user = accounts[0];
-                        document.getElementById("loginStatus").innerHTML = "Session expired. Please log in again."
-                    }
+                    console.log("Silent login failed:", error);
+                    // サイレント認証に失敗した場合は何もしない
                 }
             } else {
-                // アカウントがない場合: ssoSilent で他サイトでのログインを検出
+                // アカウントがない場合でも acquireTokenSilent を試行
                 try {
-                    const ssoRequest = {
+                    const silentRequest = {
                         scopes: loginRequest.scopes
                     };
                     
-                    const response = await msalInstance.ssoSilent(ssoRequest);
+                    const response = await msalInstance.acquireTokenSilent(silentRequest);
                     if (response && response.account) {
                         msalInstance.setActiveAccount(response.account);
                         user = response.account;
@@ -191,11 +172,9 @@
                         document.getElementById("loginStatus").innerHTML = "Currently logged in as " + user.name + " on the website."
                         document.getElementById("login").style.display = "none"
                         document.getElementById("logout").style.display = "inline"
-                        
-                        console.log("Cross-site SSO successful!");
                     }
-                } catch (ssoError) {
-                    console.log("Cross-site SSO failed:", ssoError);
+                } catch (error) {
+                    console.log("Silent login without account failed:", error);
                     // 完全に失敗した場合は何もしない（手動ログインが必要）
                 }
             }
