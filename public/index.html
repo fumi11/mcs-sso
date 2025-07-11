@@ -137,7 +137,7 @@
             const accounts = msalInstance.getAllAccounts();
 
             if (accounts.length > 0) {
-                // 既存アカウントがある場合: acquireTokenSilent を使用（キャッシュ活用）
+                // 既存アカウントがある場合: ssoSilent を使用
                 msalInstance.setActiveAccount(accounts[0]);
                 
                 try {
@@ -147,24 +147,24 @@
                         loginHint: accounts[0].username || accounts[0].name
                     };
                     
-                    await msalInstance.acquireTokenSilent(silentRequest);
+                    await msalInstance.ssoSilent(silentRequest);
                     user = accounts[0];
                     
                     document.getElementById("loginStatus").innerHTML = "Currently logged in as " + user.name + " on the website."
                     document.getElementById("login").style.display = "none"
                     document.getElementById("logout").style.display = "inline"
                 } catch (error) {
-                    console.log("Silent login failed:", error);
+                    console.log("SSO Silent login failed:", error);
                     // サイレント認証に失敗した場合は何もしない
                 }
             } else {
-                // アカウントがない場合でも acquireTokenSilent を試行
+                // アカウントがない場合でも ssoSilent を試行（他サイトでのログインを検出）
                 try {
                     const silentRequest = {
                         scopes: loginRequest.scopes
                     };
                     
-                    const response = await msalInstance.acquireTokenSilent(silentRequest);
+                    const response = await msalInstance.ssoSilent(silentRequest);
                     if (response && response.account) {
                         msalInstance.setActiveAccount(response.account);
                         user = response.account;
@@ -172,9 +172,11 @@
                         document.getElementById("loginStatus").innerHTML = "Currently logged in as " + user.name + " on the website."
                         document.getElementById("login").style.display = "none"
                         document.getElementById("logout").style.display = "inline"
+                        
+                        console.log("Cross-site SSO successful!");
                     }
                 } catch (error) {
-                    console.log("Silent login without account failed:", error);
+                    console.log("Cross-site SSO failed:", error);
                     // 完全に失敗した場合は何もしない（手動ログインが必要）
                 }
             }
